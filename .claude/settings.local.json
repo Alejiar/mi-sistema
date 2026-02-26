@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mysql -u root -e \"SHOW TABLES FROM parksystem; DESCRIBE parksystem.vehiculos;\")"
+    ]
+  }
+}

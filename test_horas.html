@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Automático - Entrada Horas</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; max-width: 900px; margin: 0 auto; }
+        .test-box { border: 2px solid #333; padding: 15px; margin: 15px 0; }
+        .success { background: #d4edda; border-color: #28a745; color: #155724; }
+        .error { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+        .info { background: #d1ecf1; border-color: #17a2b8; color: #0c5460; }
+        pre { background: #f5f5f5; padding: 10px; overflow-x: auto; }
+        table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+        table, th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background: #f9f9f9; }
+        .highlight { background: #fff3cd; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Automático - Entrada Modalidad HORAS</h1>
+    
+    <div id="tests"></div>
+
+    <script>
+        async function runTests() {
+            const testResults = [];
+            const testsDiv = document.getElementById('tests');
+
+            // Test 1: Verificar que getTarifas devuelve horas
+            testResults.push({
+                name: 'Verificar tarifas en BD',
+                type: 'info',
+                run: async () => {
+                    const response = await fetch('diagnostic.php');
+                    return response.ok ? '✓ Página de diagnóstico accesible' : '✗ Error al acceder a diagnóstico';
+                }
+            });
+
+            // Test 2: Entrada con modalidad "horas" - Carro
+            testResults.push({
+                name: 'Entrada CARRO con modal HORAS',
+                type: 'test',
+                run: async () => {
+                    const payload = {
+                        acc: 'entrada',
+                        placa: 'TEST001',
+                        tipo: 'carro',
+                        modalidad: 'horas'
+                    };
+                    
+                    const response = await fetch('php/vehiculos.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.error) {
+                        return { error: data.error, expected: '4000', received: 'ERROR', success: false };
+                    }
+                    
+                    const success = data.tarifa_hora == 4000 && data.tarifa_fraccion == 2000;
+                    return {
+                        vehiculo_id: data.vehiculo_id,
+                        expected: '4000 / 2000',
+                        received: `${data.tarifa_hora} / ${data.tarifa_fraccion}`,
+                        success: success,
+                        fullResponse: data
+                    };
+                }
+            });
+
+            // Test 3: Entrada con modalidad "horas" - Moto
+            testResults.push({
+                name: 'Entrada MOTO con modal HORAS',
+                type: 'test',
+                run: async () => {
+                    const payload = {
+                        acc: 'entrada',
+                        placa: 'TEST99',
+                        tipo: 'moto',
+                        modalidad: 'horas'
+                    };
+                    
+                    const response = await fetch('php/vehiculos.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.error) {
+                        return { error: data.error, expected: '1500', received: 'ERROR', success: false };
+                    }
+                    
+                    const success = data.tarifa_hora == 1500 && data.tarifa_fraccion == 750;
+                    return {
+                        vehiculo_id: data.vehiculo_id,
+                        expected: '1500 / 750',
+                        received: `${data.tarifa_hora} / ${data.tarifa_fraccion}`,
+                        success: success
+                    };
+                }
+            });
+
+            // Test 4: Entrada con modalidad "dia" (control)
+            testResults.push({
+                name: 'Entrada CARRO con modal DIA (control)',
+                type: 'test',
+                run: async () => {
+                    const payload = {
+                        acc: 'entrada',
+                        placa: 'CTRL001',
+                        tipo: 'carro',
+                        modalidad: 'dia'
+                    };
+                    
+                    const response = await fetch('php/vehiculos.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.error) {
+                        return { error: data.error, expected: '20000', received: 'ERROR', success: false };
+                    }
+                    
+                    const success = data.tarifa_hora == 20000;
+                    return {
+                        vehiculo_id: data.vehiculo_id,
+                        expected: '20000 (fijo)',
+                        received: `${data.tarifa_hora}`,
+                        success: success
+                    };
+                }
+            });
+
+            // Ejecutar tests
+            for (const test of testResults) {
+                const result = await test.run();
+                
+                const box = document.createElement('div');
+                box.className = `test-box ${result.success === false ? 'error' : result.success === true ? 'success' : 'info'}`;
+                
+                let html = `<h3>${test.name}</h3>`;
+                
+                if (result.error) {
+                    html += `<p><strong>Error:</strong> ${result.error}</p>`;
+                } else if (test.type === 'test') {
+                    html += `
+                        <table>
+                            <tr><td><strong>Esperado:</strong></td><td class="highlight">${result.expected}</td></tr>
+                            <tr><td><strong>Recibido:</strong></td><td class="highlight">${result.received}</td></tr>
+                            <tr><td><strong>Resultado:</strong></td><td class="highlight">${result.success ? '✓ CORRECTO' : '✗ INCORRECTO'}</td></tr>
+                        </table>
+                        <details>
+                            <summary>Ver respuesta completa</summary>
+                            <pre>${JSON.stringify(result.fullResponse || result, null, 2)}</pre>
+                        </details>
+                    `;
+                } else {
+                    html += `<p>${result}</p>`;
+                }
+                
+                box.innerHTML = html;
+                testsDiv.appendChild(box);
+            }
+
+            // Resumen
+            const allSuccess = testResults.every((_, i) => testResults[i].success);
+            const summaryBox = document.createElement('div');
+            summaryBox.className = `test-box ${allSuccess ? 'success' : 'error'}`;
+            summaryBox.innerHTML = `
+                <h2>${allSuccess ? '✓ Todos los tests pasaron' : '✗ Algunos tests fallaron'}</h2>
+                <p>Si todos los tests muestran CORRECTO, el sistema está funcionando bien.</p>
+            `;
+            testsDiv.insertBefore(summaryBox, testsDiv.firstChild);
+        }
+
+        // Ejecutar cuando cargue
+        window.addEventListener('load', runTests);
+    </script>
+</body>
+</html>

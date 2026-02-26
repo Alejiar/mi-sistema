@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test API - Entrada Horas</title>
+    <style>
+        body { font-family: monospace; padding: 20px; }
+        pre { background: #f0f0f0; padding: 10px; overflow: auto; }
+        .test { margin: 20px 0; border: 1px solid #ccc; padding: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Test API - Entrada Horas</h1>
+    <div id="resultado"></div>
+
+    <script>
+        async function testEntrada() {
+            const datos = {
+                acc: 'entrada',
+                placa: 'TEST123',
+                tipo: 'carro',
+                modalidad: 'horas'
+            };
+
+            try {
+                const response = await fetch('php/vehiculos.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(datos)
+                });
+                
+                const result = await response.json();
+                
+                document.getElementById('resultado').innerHTML = `
+                    <div class="test">
+                        <h2>Respuesta de Entrada (Horas):</h2>
+                        <pre>${JSON.stringify(result, null, 2)}</pre>
+                        
+                        <h3>Verificación:</h3>
+                        <p><strong>Tarifa/hora esperada:</strong> 4000</p>
+                        <p><strong>Tarifa/hora recibida:</strong> ${result.tarifa_hora}</p>
+                        <p><strong>Fracción esperada:</strong> 2000</p>
+                        <p><strong>Fracción recibida:</strong> ${result.tarifa_fraccion}</p>
+                        <p style="color: ${result.tarifa_hora == 4000 ? 'green' : 'red'}">
+                            <strong>${result.tarifa_hora == 4000 ? '✓ CORRECTO' : '✗ INCORRECTO'}</strong>
+                        </p>
+                    </div>
+                `;
+            } catch (e) {
+                document.getElementById('resultado').innerHTML = `<pre style="color: red;">${e.message}</pre>`;
+            }
+        }
+
+        testEntrada();
+    </script>
+</body>
+</html>

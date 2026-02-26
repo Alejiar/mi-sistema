@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Tíquete térmico</title>
+<style>
+/* configuración de impresión 58mm sin márgenes */
+@page { size: 58mm auto; margin: 0; }
+body{margin:0;padding:0;}
+#container{width:58mm;max-width:58mm;padding:0 2mm;font-family:monospace;font-size:11px;color:#000;}
+header{text-align:center;font-weight:bold;margin-bottom:4px;}
+.section{margin-bottom:4px;}
+.separator{border-top:1px dashed #000;margin:4px 0;}
+.barcode{display:block;margin:4px auto;}
+#printBtn{display:block;width:100%;margin:8px 0;padding:6px 0;font-family:monospace;font-size:11px;cursor:pointer;}
+@media print{
+  #printBtn{display:none;}
+}
+</style>
+</head>
+<body>
+<div id="container">
+  <header id="hdrName">PARQUEADERO XYZ</header>
+  <div class="section" id="info">
+    <div id="nit">NIT: 900.000.000-0</div>
+    <div id="address">Calle 1 # 2-3</div>
+    <div id="phone">Tel: 3001234567</div>
+    <div id="schedule">Horario: 24 horas</div>
+  </div>
+  <div class="separator"></div>
+  <div class="section" id="tarifa">Tarifa: Hora: $ 4.000</div>
+  <div class="section" id="placa">Placa: ABC123</div>
+  <div class="section" id="entrada">Entrada: 2026-02-26 14:35</div>
+  <svg id="barcode" class="barcode"></svg>
+  <div class="separator"></div>
+  <div class="section" id="condiciones">
+    <div>1. No nos hacemos responsables por objetos dejados en el vehículo.</div>
+    <div>2. El tiempo se redondea a la hora entera más cercana.</div>
+    <div>3. Pagos cancelados no tienen devolución.</div>
+  </div>
+</div>
+<button id="printBtn">Imprimir</button>
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+<script>
+function fmtMoney(v){
+  return '$ ' + v.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+}
+
+document.getElementById('printBtn').addEventListener('click',function(){
+  window.print();
+});
+
+// generar código de barras ejemplo
+JsBarcode('#barcode','ABC123202602261435',{format:'CODE128',width:0.6,height:40,displayValue:false});
+</script>
+</body>
+</html>

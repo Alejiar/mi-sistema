@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ParkSystem</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+<style>@media print{.ract{display:none;}}</style>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="ls">
+  <div class="lc">
+    <div class="lh">
+      <div class="li">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" width="24" height="24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M7 12h10M12 7v10"/></svg>
+      </div>
+      <h1>ParkSystem</h1><p>Sistema de Parqueadero</p>
+    </div>
+    <div id="la"></div>
+    <div class="fg"><label class="fl">Usuario</label><input id="lu" class="fc" placeholder="Usuario" autocomplete="off"></div>
+    <div class="fg"><label class="fl">Contraseña</label><input id="lp" type="password" class="fc" placeholder="••••••••"></div>
+    <button class="btn bp bbl blg" style="margin-top:8px" onclick="doLogin()">Ingresar</button>
+    <p style="text-align:center;color:var(--txt3);font-size:.75rem;margin-top:12px">admin / password</p>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="tb">
+    <div class="tb-l">
+      <div class="tb-brand"><b>Park</b>System</div>
+      <div class="tb-pg" id="tbpg">Dashboard</div>
+    </div>
+    <div class="tb-r">
+      <div class="clock" id="clk">00:00:00</div>
+      <button class="btn bs bsm" onclick="doLogout()">Salir</button>
+    </div>
+  </div>
+
+  <div class="ab">
+    <!-- SIDEBAR -->
+    <div class="sb">
+      <div class="sbh">
+        <div class="sb-logo">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" width="18"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 12h8M12 8v8"/></svg></div>
+          <div><span>ParkSystem</span><small>Gestión Pro</small></div>
+        </div>
+      </div>
+      <div class="sbg">
+        <div class="sbl">Principal</div>
+        <div class="ni active" data-p="dashboard" onclick="sp('dashboard',this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard
+        </div>
+        <div class="ni" data-p="es" onclick="sp('es',this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>Entradas / Salidas
+        </div>
+        <div class="ni" data-p="historial" onclick="sp('historial',this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Historial Salidas
+        </div>
+        <div class="ni" data-p="mensualidades" onclick="sp('mensualidades',this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Mensualidades
+          <span class="nbadge" id="bmens">0</span>
+        </div>
+      </div>
+      <div class="sbg">
+        <div class="sbl">Análisis</div>
+        <div class="ni" data-p="pagos" onclick="sp('pagos',this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg>Pagos
+        </div>
+        <div class="ni" data-p="reportes" onclick="sp('reportes',this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>Reportes
+        </div>
+      </div>
+      <div class="sbg">
+        <div class="sbl">Turno</div>
+        <div class="ni" data-p="caja" onclick="sp('caja',this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-4 0v2M12 12v3"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg>Caja / Turno
+          <span class="nbadge" id="bcaja-nav" style="background:var(--green);color:#fff">●</span>
+        </div>
+      </div>
+      <div class="sbg admin-only">
+        <div class="sbl">Admin</div>
+        <div class="ni" data-p="config" onclick="sp('config',this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Configuración
+        </div>
+      </div>
+      <div class="sbf">
+        <div class="sbu">
+          <div class="av" id="sav">A</div>
+          <div><span id="snombre">Admin</span><small id="srol">Administrador</small></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="ct">
+
+      <!-- DASHBOARD -->
+      <div id="pg-dashboard" class="pg active">
+        <div class="ph">
+          <div><div class="pt">Dashboard</div><div class="ps" id="dfecha"></div></div>
+          <button class="btn bs bsm" onclick="loadDash()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>Actualizar
+          </button>
+        </div>
+        <div class="g4" style="margin-bottom:14px">
+          <div class="sc" style="display:flex;align-items:center;gap:12px">
+            <div class="si" style="background:var(--blue-l)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-4 0v2M12 12v3"/></svg></div>
+            <div><div class="sl">Carros activos</div><div class="sv" id="d-c">0</div></div>
+          </div>
+          <div class="sc" style="display:flex;align-items:center;gap:12px">
+            <div class="si" style="background:var(--pur-l)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--pur)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div>
+            <div><div class="sl">Motos activas</div><div class="sv" id="d-m">0</div></div>
+          </div>
+          <div class="sc" style="display:flex;align-items:center;gap:12px">
+            <div class="si" style="background:var(--green-l)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 100 7h5a3.5 3.5 0 110 7H6"/></svg></div>
+            <div><div class="sl">Ingresos hoy</div><div class="sv" id="d-ing">$0</div></div>
+          </div>
+          <div class="sc" style="display:flex;align-items:center;gap:12px">
+            <div class="si" style="background:var(--yel-l)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--yel)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+            <div><div class="sl">Tiempo promedio</div><div class="sv" id="d-prom">0h</div></div>
+          </div>
+        </div>
+
+        <!-- Modalidades -->
+        <div class="g4" style="margin-bottom:14px">
+          <div class="card"><div class="ct2">Día</div><div id="dm-dia" style="font-size:.82rem;color:var(--txt2)">Sin vehículos</div></div>
+          <div class="card"><div class="ct2">Noche</div><div id="dm-noche" style="font-size:.82rem;color:var(--txt2)">Sin vehículos</div></div>
+          <div class="card"><div class="ct2">24 Horas</div><div id="dm-24h" style="font-size:.82rem;color:var(--txt2)">Sin vehículos</div></div>
+          <div class="card"><div class="ct2">Mensualidad</div><div id="dm-mens" style="font-size:.82rem;color:var(--txt2)">Sin vehículos</div></div>
+        </div>
+
+        <!-- Ocupación -->
+        <div class="g2" style="margin-bottom:14px">
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div><div style="font-weight:700">Carros</div><div style="font-size:.78rem;color:var(--txt2)" id="occ-c">0/0</div></div>
+              <div style="font-size:.82rem;color:var(--txt2)" id="pct-c">0%</div>
+            </div>
+            <div class="prog"><div class="progb" id="bar-c" style="width:0%;background:var(--blue)"></div></div>
+          </div>
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div><div style="font-weight:700">Motos</div><div style="font-size:.78rem;color:var(--txt2)" id="occ-m">0/0</div></div>
+              <div style="font-size:.82rem;color:var(--txt2)" id="pct-m">0%</div>
+            </div>
+            <div class="prog"><div class="progb" id="bar-m" style="width:0%;background:var(--pur)"></div></div>
+          </div>
+        </div>
+
+        <div class="g2">
+          <div class="card">
+            <div class="ct2">Ingresos últimos 7 días</div>
+            <canvas id="ch-ing" height="140"></canvas>
+          </div>
+          <div class="card">
+            <div class="ct2">Actividad reciente</div>
+            <table><thead><tr><th>Placa</th><th>Tipo</th><th>Modal.</th><th>Hora entrada</th><th></th></tr></thead>
+            <tbody id="d-rec"></tbody></table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- ENTRADAS / SALIDAS (VISTA UNIFICADA)                         -->
+      <!-- ============================================================ -->
+      <div id="pg-es" class="pg">
+        <div class="ph">
+          <div>
+            <div class="pt">Entradas / Salidas</div>
+            <div class="ps" id="es-resumen">Cargando...</div>
+          </div>
+          <button class="btn bs bsm" onclick="loadActivos()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>Actualizar
+          </button>
+        </div>
+
+        <!-- FILA SUPERIOR: ENTRADA (izq) + SALIDA (der) -->
+        <div class="g2" style="margin-bottom:14px;align-items:start">
+
+          <!-- ── ENTRADA ── -->
+          <div class="card">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+              <div style="width:10px;height:10px;border-radius:50%;background:var(--green);flex-shrink:0"></div>
+              <div class="ct2" style="margin:0;color:var(--green)">Registrar Entrada</div>
+            </div>
+            <div id="ea"></div>
+            <div class="fg">
+              <label class="fl">Placa</label>
+              <input id="ep" class="fc placa" placeholder="ABC123" maxlength="6"
+                     oninput="onPlaca(this)" onkeydown="if(event.key==='Enter')doEntrada()">
+            </div>
+            <div class="tpill tn" id="etpill">Ingrese la placa</div>
+            <div class="fg" style="margin-top:8px">
+              <label class="fl">Modalidad</label>
+              <select id="emod" class="fc">
+                <option value="dia">Día (fijo)</option>
+                <option value="noche">Noche (fijo)</option>
+                <option value="24horas">24 Horas (fijo)</option>
+                <option value="horas">Horas (por tiempo)</option>
+              </select>
+            </div>
+            <div id="ecas-sec" style="display:none">
+              <div class="fg">
+                <label class="fl">Casillero de casco <span style="color:var(--red)">*</span></label>
+                <div class="casg" id="ecas-grid"></div>
+                <input type="hidden" id="ecas-id">
+                <div style="margin-top:5px;font-size:.72rem;color:var(--txt2)">
+                  <span style="color:var(--green)">■</span> Libre &nbsp;
+                  <span style="color:var(--txt3)">■</span> Ocupado &nbsp;
+                  <span style="color:var(--blue)">■</span> Seleccionado
+                </div>
+              </div>
+            </div>
+            <button class="btn bp bbl blg" onclick="doEntrada()" style="background:var(--green)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14"><path d="M12 5v14M5 12h14"/></svg>
+              Registrar Entrada
+            </button>
+          </div>
+
+          <!-- ── SALIDA ── -->
+          <div class="card" id="sal-card">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+              <div style="width:10px;height:10px;border-radius:50%;background:var(--red);flex-shrink:0"></div>
+              <div class="ct2" style="margin:0;color:var(--red)">Registrar Salida</div>
+            </div>
+            <div id="sa"></div>
+            <div class="fg">
+              <label class="fl">Placa o código de barras</label>
+              <input id="sb-inp" class="fc placa" placeholder="ABC123 o escanear..."
+                     oninput="this.value=this.value.toUpperCase()"
+                     onkeydown="if(event.key==='Enter')doBuscar()">
+            </div>
+            <button class="btn bp bbl" onclick="doBuscar()" style="margin-bottom:4px">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>Buscar vehículo
+            </button>
+
+            <!-- Resultado de búsqueda (se muestra al encontrar un vehículo) -->
+            <div id="sc-info" style="display:none">
+              <hr class="sep">
+              <div class="ct2" id="sc-tit" style="margin-bottom:10px">Cobro</div>
+              <div id="sc-body"></div>
+            </div>
+          </div>
+
+        </div><!-- /g2 -->
+
+        <!-- ── TABLA DE VEHÍCULOS ACTIVOS ── -->
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+            <div style="display:flex;align-items:center;gap:12px">
+              <div class="ct2" style="margin:0">Vehículos en parqueadero</div>
+              <div style="background:var(--blue-l);color:var(--blue);border-radius:20px;padding:2px 10px;font-size:.75rem;font-weight:700" id="act-badge">0 activos</div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <input id="act-q" class="fc" style="width:180px;height:32px" placeholder="Buscar placa..."
+                     oninput="filtAct(this.value)">
+              <button class="btn bs bsm" onclick="loadActivos()" title="Actualizar">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="tw">
+            <table>
+              <thead>
+                <tr>
+                  <th>Placa</th>
+                  <th>Tipo</th>
+                  <th>Modalidad</th>
+                  <th>Hora Entrada</th>
+                  <th>⏱ Tiempo</th>
+                  <th>Casillero</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="act-tb"></tbody>
+            </table>
+          </div>
+        </div>
+
+      </div><!-- /pg-es -->
+
+      <!-- ============================================================ -->
+      <!-- HISTORIAL DE SALIDAS (página separada)                       -->
+      <!-- ============================================================ -->
+      <div id="pg-historial" class="pg">
+        <div class="ph">
+          <div><div class="pt">Historial de Salidas</div><div class="ps">Registro completo de vehículos finalizados</div></div>
+        </div>
+        <div class="card" style="margin-bottom:12px">
+          <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end">
+            <div class="fg" style="margin:0;flex:1;min-width:120px"><label class="fl">Desde</label><input type="date" id="hd" class="fc"></div>
+            <div class="fg" style="margin:0;flex:1;min-width:120px"><label class="fl">Hasta</label><input type="date" id="hh" class="fc"></div>
+            <div class="fg" style="margin:0;flex:1;min-width:120px"><label class="fl">Placa</label><input id="hp" class="fc" placeholder="Opcional" oninput="this.value=this.value.toUpperCase()"></div>
+            <button class="btn bp" onclick="loadHist()">Buscar</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="tw">
+            <table>
+              <thead>
+                <tr>
+                  <th>Placa</th><th>Tipo</th><th>Modal.</th><th>Entrada</th>
+                  <th>Salida</th><th>Tiempo</th><th>Total</th><th>Estado</th><th>Recibo</th>
+                </tr>
+              </thead>
+              <tbody id="hist-tb"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- MENSUALIDADES -->
+      <div id="pg-mensualidades" class="pg">
+        <div class="ph">
+          <div><div class="pt">Mensualidades</div><div class="ps">Gestión de clientes mensuales</div></div>
+          <button class="btn bp" onclick="openM('m-nueva')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13"><path d="M12 5v14M5 12h14"/></svg>Nueva
+          </button>
+        </div>
+        <div class="g3" style="margin-bottom:14px">
+          <div class="sc" style="display:flex;align-items:center;gap:12px">
+            <div class="si" style="background:var(--green-l)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div><div class="sl">Activas</div><div class="sv" id="mn-a">0</div></div>
+          </div>
+          <div class="sc" style="display:flex;align-items:center;gap:12px">
+            <div class="si" style="background:var(--yel-l)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--yel)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+            <div><div class="sl">Pendientes</div><div class="sv" id="mn-p">0</div></div>
+          </div>
+          <div class="sc" style="display:flex;align-items:center;gap:12px">
+            <div class="si" style="background:var(--red-l)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></div>
+            <div><div class="sl">Vencidas</div><div class="sv" id="mn-v">0</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+            <div class="ct2" style="margin:0">Listado</div>
+            <input id="mq" class="fc" style="width:200px" placeholder="Buscar..." oninput="filtMens(this.value)">
+          </div>
+          <div class="tw"><table>
+            <thead><tr><th>Placa</th><th>Tipo</th><th>Cliente</th><th>Teléfono</th><th>Vencimiento</th><th>Monto</th><th>Estado</th><th>Acciones</th></tr></thead>
+            <tbody id="mens-tb"></tbody>
+          </table></div>
+        </div>
+      </div>
+
+      <!-- PAGOS -->
+      <div id="pg-pagos" class="pg">
+        <div class="ph">
+          <div><div class="pt">Pagos</div><div class="ps">Resumen de ingresos</div></div>
+          <div style="display:flex;gap:8px;align-items:flex-end">
+            <div class="fg" style="margin:0"><label class="fl">Fecha</label><input type="date" id="pf" class="fc" style="width:160px"></div>
+            <button class="btn bp" onclick="loadPagos()">Ver</button>
+          </div>
+        </div>
+        <div class="g3" style="margin-bottom:14px">
+          <div class="sc" style="display:flex;align-items:center;gap:12px">
+            <div class="si" style="background:var(--green-l)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 100 7h5a3.5 3.5 0 110 7H6"/></svg></div>
+            <div><div class="sl">Efectivo</div><div class="sv" id="pef">$0</div></div>
+          </div>
+          <div class="sc" style="display:flex;align-items:center;gap:12px">
+            <div class="si" style="background:var(--blue-l)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg></div>
+            <div><div class="sl">Tarjeta</div><div class="sv" id="ptar">$0</div></div>
+          </div>
+          <div class="sc" style="display:flex;align-items:center;gap:12px">
+            <div class="si" style="background:var(--pur-l)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--pur)" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg></div>
+            <div><div class="sl">Transferencia</div><div class="sv" id="ptra">$0</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="ct2">Detalle de pagos del día</div>
+          <div class="tw"><table>
+            <thead><tr><th>Placa</th><th>Tipo</th><th>Tiempo</th><th>Total</th><th>Método</th><th>Hora salida</th></tr></thead>
+            <tbody id="pag-tb"></tbody>
+          </table></div>
+        </div>
+      </div>
+
+      <!-- REPORTES -->
+      <div id="pg-reportes" class="pg">
+        <div class="ph">
+          <div><div class="pt">Reportes</div></div>
+          <div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap">
+            <div class="fg" style="margin:0"><label class="fl">Fecha</label><input type="date" id="rf" class="fc" style="width:150px"></div>
+            <div class="fg" style="margin:0"><label class="fl">Período</label>
+              <select id="rp" class="fc" style="width:130px">
+                <option value="dia">Por día</option>
+                <option value="semana">Semana</option>
+                <option value="mes">Mes</option>
+                <option value="anio">Año</option>
+              </select>
+            </div>
+            <button class="btn bp" onclick="loadRep()">Ver</button>
+            <button class="btn bs" onclick="expCSV()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>CSV
+            </button>
+          </div>
+        </div>
+        <div class="g4" style="margin-bottom:14px" id="rep-stats"></div>
+        <div class="g2" style="margin-bottom:14px">
+          <div class="card"><div class="ct2">Ingresos por período</div><canvas id="ch-rep" height="160"></canvas></div>
+          <div class="card"><div class="ct2">Por modalidad</div><div id="rep-modal"></div></div>
+        </div>
+        <div class="card">
+          <div class="ct2">Por método de pago</div>
+          <div id="rep-metodos"></div>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- CAJA / TURNO                                                 -->
+      <!-- ============================================================ -->
+      <div id="pg-caja" class="pg">
+        <div class="ph">
+          <div><div class="pt">Caja / Turno</div><div class="ps" id="caja-sub">Turno activo</div></div>
+          <button class="btn br" onclick="cerrarCaja()" id="btn-cerrar-caja">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+            Cerrar Caja
+          </button>
+        </div>
+
+        <!-- Banner info turno activo -->
+        <div id="caja-banner" class="al ai" style="margin-bottom:14px"></div>
+
+        <!-- Stats del turno -->
+        <div class="g3" style="margin-bottom:14px">
+          <div class="sc" style="display:flex;align-items:center;gap:12px">
+            <div class="si" style="background:var(--green-l)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 100 7h5a3.5 3.5 0 110 7H6"/></svg></div>
+            <div><div class="sl">Efectivo turno</div><div class="sv" id="cj-ef">$0</div></div>
+          </div>
+          <div class="sc" style="display:flex;align-items:center;gap:12px">
+            <div class="si" style="background:var(--blue-l)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg></div>
+            <div><div class="sl">Tarjeta turno</div><div class="sv" id="cj-tar">$0</div></div>
+          </div>
+          <div class="sc" style="display:flex;align-items:center;gap:12px">
+            <div class="si" style="background:var(--pur-l)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--pur)" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg></div>
+            <div><div class="sl">Transferencia turno</div><div class="sv" id="cj-tra">$0</div></div>
+          </div>
+        </div>
+
+        <div class="g2" style="margin-bottom:14px">
+          <div class="sc" style="display:flex;align-items:center;gap:12px">
+            <div class="si" style="background:var(--blue-l)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+            <div><div class="sl">Total ingresos turno</div><div class="sv" id="cj-ing">$0</div></div>
+          </div>
+          <div class="sc" style="display:flex;align-items:center;gap:12px">
+            <div class="si" style="background:var(--yel-l)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--yel)" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-4 0v2"/></svg></div>
+            <div><div class="sl">Salidas registradas</div><div class="sv" id="cj-sal">0</div></div>
+          </div>
+        </div>
+
+        <!-- Últimas transacciones del turno -->
+        <div class="card" style="margin-bottom:14px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+            <div class="ct2" style="margin:0">Transacciones del turno actual</div>
+            <button class="btn bs bsm" onclick="loadCaja()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+            </button>
+          </div>
+          <div class="tw">
+            <table>
+              <thead><tr><th>Placa</th><th>Tipo</th><th>Modalidad</th><th>Hora salida</th><th>Tiempo</th><th>Total</th><th>Método</th></tr></thead>
+              <tbody id="cj-tb"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Historial de cierres anteriores -->
+        <div class="card">
+          <div class="ct2">Cierres anteriores</div>
+          <div id="cj-hist"></div>
+        </div>
+      </div>
+
+      <!-- CONFIGURACIÓN -->
+      <div id="pg-config" class="pg">
+        <div class="ph">
+          <div><div class="pt">Configuración</div></div>
+          <button class="btn bp" onclick="saveConfig()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Guardar
+          </button>
+        </div>
+        <div id="cfg-al"></div>
+        <div class="tabs">
+          <div class="tab active" onclick="scfg('general',this)">General</div>
+          <div class="tab" onclick="scfg('tarifas',this)">Tarifas</div>
+          <div class="tab" onclick="scfg('convenios',this)">Convenios</div>
+          <div class="tab" onclick="scfg('recibos',this)">Recibos</div>
+          <div class="tab" onclick="scfg('usuarios',this)">Usuarios</div>
+        </div>
+
+        <!-- GENERAL -->
+        <div id="cfg-general">
+          <div class="g2">
+            <div class="card">
+              <div class="ct2">Información del parqueadero</div>
+              <div class="fg"><label class="fl">Nombre</label><input id="cn" class="fc"></div>
+              <div class="fg"><label class="fl">NIT</label><input id="cnit" class="fc"></div>
+              <div class="fg"><label class="fl">Dirección</label><input id="cdir" class="fc"></div>
+              <div class="fg"><label class="fl">Teléfono</label><input id="ctel" class="fc"></div>
+            </div>
+            <div class="card">
+              <div class="ct2">Parámetros y espacios</div>
+              <div class="fg"><label class="fl">Tiempo de gracia (minutos)</label><input type="number" id="cgr" class="fc" min="0" max="59"></div>
+              <div class="fg"><label class="fl">Total espacios carros</label><input type="number" id="cec" class="fc" min="1"></div>
+              <div class="fg"><label class="fl">Total espacios motos</label><input type="number" id="cem" class="fc" min="1"></div>
+              <div class="fg"><label class="fl">Casilleros de casco disponibles</label><input type="number" id="ccas" class="fc" min="0" onchange="updateCasilleros(this.value)"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TARIFAS -->
+        <div id="cfg-tarifas" style="display:none">
+          <div class="fg" style="margin-bottom:14px;max-width:300px">
+            <label class="fl">Tiempo de gracia (minutos)</label>
+            <input type="number" id="cgr2" class="fc" min="0" max="59" placeholder="ej: 10">
+            <div style="font-size:.75rem;color:var(--txt2);margin-top:4px">Si el exceso de tiempo es menor a este valor, no se cobra fracción</div>
+          </div>
+          <div class="g2" id="tar-grid"></div>
+        </div>
+
+        <!-- CONVENIOS -->
+        <div id="cfg-convenios" style="display:none">
+          <div class="g2">
+            <div class="card">
+              <div class="ct2">Nuevo convenio</div>
+              <div id="conv-al"></div>
+              <div class="fg"><label class="fl">Nombre</label><input id="cvn" class="fc"></div>
+              <div class="fg"><label class="fl">Tipo</label>
+                <select id="cvt" class="fc" onchange="updConvLbl()">
+                  <option value="horas_gratis">Horas gratis</option>
+                  <option value="descuento_fijo">Descuento fijo ($)</option>
+                  <option value="porcentaje">Porcentaje (%)</option>
+                </select>
+              </div>
+              <div class="fg"><label class="fl" id="cvl">Número de horas</label><input type="number" id="cvv" class="fc"></div>
+              <button class="btn bp bbl" onclick="saveConv()">Crear convenio</button>
+            </div>
+            <div class="card"><div class="ct2">Convenios</div><div id="conv-list"></div></div>
+          </div>
+        </div>
+
+        <!-- RECIBOS -->
+        <div id="cfg-recibos" style="display:none">
+          <div class="g2">
+            <div class="card">
+              <div class="ct2">Encabezado del recibo</div>
+              <div class="fg"><label class="fl">Logo (URL de imagen)</label>
+                <input id="rlogo" class="fc" placeholder="https://ejemplo.com/logo.png">
+                <div style="font-size:.72rem;color:var(--txt2);margin-top:3px">URL pública de tu logo.</div>
+              </div>
+              <div id="logo-prev" style="margin:8px 0"></div>
+              <div class="fg"><label class="fl">Nombre del parqueadero en recibo</label><input id="rnombre" class="fc"></div>
+              <div class="fg"><label class="fl">NIT</label><input id="rnit" class="fc"></div>
+              <div class="fg"><label class="fl">Dirección</label><input id="rdir" class="fc"></div>
+              <div class="fg"><label class="fl">Teléfono</label><input id="rtel" class="fc"></div>
+              <div class="fg"><label class="fl">Texto libre adicional en encabezado</label>
+                <textarea id="renc" class="fc" rows="2" placeholder="Ej: Horario 24hrs · Vigilado"></textarea>
+              </div>
+            </div>
+            <div class="card">
+              <div class="ct2">Opciones del recibo</div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--brd)">
+                <span style="font-size:.85rem">Mostrar NIT</span>
+                <label class="tg"><input type="checkbox" id="rmn" checked><span class="tgs"></span></label>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--brd)">
+                <span style="font-size:.85rem">Mostrar dirección</span>
+                <label class="tg"><input type="checkbox" id="rmd" checked><span class="tgs"></span></label>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--brd)">
+                <span style="font-size:.85rem">Mostrar teléfono</span>
+                <label class="tg"><input type="checkbox" id="rmt" checked><span class="tgs"></span></label>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--brd)">
+                <span style="font-size:.85rem">Mostrar código de barras</span>
+                <label class="tg"><input type="checkbox" id="rmb" checked><span class="tgs"></span></label>
+              </div>
+              <div class="fg" style="margin-top:12px"><label class="fl">Ancho del papel (mm)</label>
+                <select id="rancho" class="fc">
+                  <option value="58">58mm</option>
+                  <option value="72">72mm</option>
+                  <option value="80" selected>80mm (estándar)</option>
+                  <option value="110">110mm</option>
+                </select>
+              </div>
+              <div class="fg"><label class="fl">Mensaje pie de recibo</label>
+                <input id="rpie" class="fc" placeholder="Gracias por su visita">
+              </div>
+              <button class="btn bs bsm" onclick="prevRecibo()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>Vista previa
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- USUARIOS -->
+        <div id="cfg-usuarios" style="display:none">
+          <div class="g2">
+            <div class="card">
+              <div class="ct2">Nuevo usuario</div>
+              <div id="usr-al"></div>
+              <div class="fg"><label class="fl">Nombre completo</label><input id="un" class="fc"></div>
+              <div class="fg"><label class="fl">Usuario</label><input id="uu" class="fc"></div>
+              <div class="fg"><label class="fl">Contraseña</label><input type="password" id="up" class="fc"></div>
+              <div class="fg"><label class="fl">Rol</label>
+                <select id="ur" class="fc"><option value="operador">Operador</option><option value="admin">Administrador</option></select>
+              </div>
+              <button class="btn bp bbl" onclick="saveUsr()">Crear usuario</button>
+            </div>
+            <div class="card"><div class="ct2">Usuarios del sistema</div><div id="usr-list"></div></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /ct -->
+  </div><!-- /ab -->
+</div><!-- /app -->
+
+<!-- MODAL Nueva mensualidad -->
+<div id="m-nueva" class="mo">
+  <div class="md">
+    <div class="mh"><div class="mt">Nueva Mensualidad</div><button class="mx" onclick="closeM('m-nueva')">✕</button></div>
+    <div class="mc">
+      <div id="nm-al"></div>
+      <div class="fg"><label class="fl">Placa</label><input id="nmp" class="fc placa" placeholder="ABC123" maxlength="6" oninput="this.value=this.value.toUpperCase()"></div>
+      <div class="fg"><label class="fl">Nombre del cliente</label><input id="nmn" class="fc"></div>
+      <div class="fg"><label class="fl">Teléfono</label><input id="nmt" class="fc" placeholder="3001234567"></div>
+      <div id="nm-tar" class="al ai" style="display:none"></div>
+    </div>
+    <div class="mf">
+      <button class="btn bs" onclick="closeM('m-nueva')">Cancelar</button>
+      <button class="btn bp" onclick="crearMens()">Crear mensualidad</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL Pago mensualidad -->
+<div id="m-pago" class="mo">
+  <div class="md">
+    <div class="mh"><div class="mt">Registrar Pago</div><button class="mx" onclick="closeM('m-pago')">✕</button></div>
+    <div class="mc">
+      <input type="hidden" id="pmid">
+      <div id="pm-info" style="margin-bottom:14px"></div>
+      <div class="fg"><label class="fl">Método de pago</label>
+        <select id="pmmet" class="fc">
+          <option value="efectivo">Efectivo</option>
+          <option value="tarjeta">Tarjeta</option>
+          <option value="transferencia">Transferencia</option>
+        </select>
+      </div>
+    </div>
+    <div class="mf">
+      <button class="btn bs" onclick="closeM('m-pago')">Cancelar</button>
+      <button class="btn bg" onclick="pagarMens()">Confirmar pago</button>
+    </div>
+  </div>
+</div>
+
+<!-- RECIBO -->
+<div id="ro">
+  <div class="rw">
+    <div class="rp" id="rp-wrap">
+      <div class="rc" id="rhtml"></div>
+    </div>
+    <div class="ract">
+      <button class="btn bp" onclick="printR()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Imprimir
+      </button>
+      <button class="btn bs" onclick="closeR()">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
